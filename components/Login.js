@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import { Text, TextInput, View, StyleSheet, Button, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
+
 const Login = () => {
     const navigation = useNavigation();
     
@@ -32,7 +33,9 @@ const Login = () => {
             }
         }
 
-
+        const handleRegisterClick = () => {
+            navigation.navigate("Register");
+        }
 
   return (
  <View style={styles.container}>
@@ -51,8 +54,8 @@ const Login = () => {
     <Pressable style={styles.loginButton} onPress={handleLogin}>
         <Text style={{fontSize: 20, color: "white", fontWeight: "bold"}}>Login</Text>
     </Pressable>
-    <Pressable style={styles.registerButton} 
-     >
+
+    <Pressable style={styles.registerButton} onPress={handleRegisterClick}>
         <Text  style={{fontSize: 18, color: "white", fontWeight: "bold"}}>Register</Text>
     </Pressable>
  </View>
