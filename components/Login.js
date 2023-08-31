@@ -25,7 +25,8 @@ const Login = () => {
                 });
         
                 const data = await response.json();
-                const accessToken = data.access_token;
+                const accessToken = data.data.accessToken;
+                console.log(accessToken)
                 // Navigate to Messages screen and pass access token as a parameter
                 navigation.navigate('Messages', { token: accessToken });
             } catch (error) {
