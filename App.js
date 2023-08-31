@@ -6,23 +6,22 @@ import Messages from "./components/Messages"
 import Register from './components/Register';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import AuthNavigator from './components/authentication/navigators/AuthNavigator';
+import AppNavigator from './components/authentication/navigators/AppNavigator';
+import RootNavigator from './components/authentication/navigators/RootNavigator';
+import { AuthProvider } from './components/authentication/contexts/AuthContext';
 
 
 export default function App() {
   const Stack = createStackNavigator();
+
+
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen  name="Login" component={Login} />
-        <Stack.Screen name="Messages" component={Messages} />
-        <Stack.Screen name="Register" component={Register} />
-      </Stack.Navigator>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
     </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-
-  },
-});

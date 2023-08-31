@@ -1,12 +1,13 @@
-import React, { useEffect, useState} from 'react'
+import React, { useEffect, useState, useContext} from 'react'
 import { Text, TextInput, View, StyleSheet, Button, Pressable, FlatList } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from './authentication/contexts/AuthContext';
 
 
 
 
-const Messages = ({ route }) => {
-    const { token } = route.params;
+const Messages = () => {
+    const {accessToken} = useContext(AuthContext);
     const [messages, setMessages] = useState([]);
 
     const fetchMessages = async () => {
@@ -15,13 +16,11 @@ const Messages = ({ route }) => {
                 method: "GET",
                 headers: {
                    'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${accessToken}`
                }
     
             })
-            console.log(response)
             const data = await response.json();
-            console.log(data)
             if (data.status == "200") {
                setMessages(data);
             }
@@ -33,7 +32,6 @@ const Messages = ({ route }) => {
        }
        useEffect(() => {
         fetchMessages();
-        console.log(token)
     }, []);
 
     const messageItem = ({ item }) => (

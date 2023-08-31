@@ -1,42 +1,17 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import { Text, TextInput, View, StyleSheet, Button, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
-
+import { AuthProvider } from './authentication/contexts/AuthContext';
+import {AuthContext} from "./authentication/contexts/AuthContext"
 const Login = () => {
     const navigation = useNavigation();
     
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
-
-        const handleLogin = async () => {
-            try {
-                // Fetch access token from the API
-                const credentials = {
-                    username: username,
-                    password: password
-                };
+    const {handleLogin, handleRegisterClick} = useContext(AuthContext)
         
-                const response = await fetch("https://chat-api-with-auth.up.railway.app/auth/token", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(credentials),
-                });
-        
-                const data = await response.json();
-                const accessToken = data.data.accessToken;
-                console.log(accessToken)
-                // Navigate to Messages screen and pass access token as a parameter
-                navigation.navigate('Messages', { token: accessToken });
-            } catch (error) {
-                console.log("Login error:", error);
-            }
-        }
 
-        const handleRegisterClick = () => {
-            navigation.navigate("Register");
-        }
+   
 
   return (
  <View style={styles.container}>
@@ -52,7 +27,7 @@ const Login = () => {
      onChangeText={setPassword} 
      secureTextEntry={true} />
 
-    <Pressable style={styles.loginButton} onPress={handleLogin}>
+    <Pressable style={styles.loginButton} onPress={() => handleLogin(username, password)}>
         <Text style={{fontSize: 20, color: "white", fontWeight: "bold"}}>Login</Text>
     </Pressable>
 
