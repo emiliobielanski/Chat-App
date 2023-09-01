@@ -7,12 +7,12 @@ import {AuthContext} from "../contexts/AuthContext"
 
 
 const RootNavigator = () => {
-    const {accessToken} = useContext(AuthContext);
-    console.log(accessToken)
+    const {isLoggedIn} = useContext(AuthContext);
+    console.log(isLoggedIn)
   return (
     <View>
         {
-            accessToken !== null
+            isLoggedIn == true
         ? <AppNavigator />
         : <AuthNavigator />  
          }

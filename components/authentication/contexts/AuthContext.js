@@ -5,6 +5,7 @@ export const AuthContext = createContext()
 export const AuthProvider = ({children}) => {
 
     const [accessToken, setAccessToken] = useState(null)
+    const [isLoggedin, setIsLoggedIn] = useState(false)
     const handleLogin = async () => {
        
             try {
@@ -24,7 +25,7 @@ export const AuthProvider = ({children}) => {
         
                 const data = await response.json();
                 setAccessToken(data.data.accessToken);
-                
+                setIsLoggedIn(true)
                 // Navigate to Messages screen and pass access token as a parameter
                 navigation.navigate('Messages', { token: accessToken });
             } catch (error) {
@@ -38,7 +39,7 @@ export const AuthProvider = ({children}) => {
 
     
     return (
-        <AuthContext.Provider value={[accessToken, handleLogin, handleRegisterClick]}>
+        <AuthContext.Provider value={[accessToken, handleLogin, handleRegisterClick, isLoggedin]}>
             {children}
         </AuthContext.Provider>
     )
