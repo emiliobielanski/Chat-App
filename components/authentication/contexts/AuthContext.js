@@ -30,7 +30,7 @@ const AuthProvider = ({children, navigation}) => {
                     const data = await response.json();
                 await AsyncStorage.setItem('accessToken', data.data.accessToken)
                 setAccessToken(data.data.accessToken)
-                setUserID(data.data._id)
+                setUserID(data.data.user._id)
                 navigation.navigate('Messages');
                 } else if (data.status !== 200){
                     alert(data.message)
@@ -82,7 +82,7 @@ const AuthProvider = ({children, navigation}) => {
             handleLogin,
             handleRegisterClick, 
             handleLogout,
-            userID,}}>
+            userID}}>
             {children}
         </AuthContext.Provider>
     )

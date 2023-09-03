@@ -13,7 +13,7 @@ export const Messages = () => {
     } = useContext(AuthContext);
 
     const [loading, setLoading] = useState(true);
-
+    const [userMessage, setUserMesssage] = useState("")
     const [messagesArray, setMessagesArray] = useState([])
 
     const fetchMessages = async () => {
@@ -24,7 +24,7 @@ export const Messages = () => {
                    'Content-Type': 'application/json',
                     "Authorization": `Bearer ${accessToken}`
                }
-    
+               
             })
             const data = await response.json();
             if (data.status == "200") {
@@ -43,13 +43,44 @@ export const Messages = () => {
         fetchMessages();
     }, []);
 
+    const sendMessage = async (userMessage) => {
+        try {
+            const messageContent = {
+                content: userMessage
+            };
 
-    const messageItem = ({ item }) => (
-      <View  style = {styles.listContainer}>
-        <Text> {item.content}</Text>
-      </View>
-    );
-  
+            const response = await fetch("https://chat-api-with-auth.up.railway.app/messages",{
+                method: "POST",
+                headers: {
+                   'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${accessToken}`
+               },
+               body: JSON.stringify(messageContent)
+    
+            })
+            fetchMessages();
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+    const messageItem = ({ item }) => {
+        let isCurrentUserMessage = false;
+
+        if (item.user && item.user._id === userID) {
+            isCurrentUserMessage = true;
+        }
+        return (
+          <View
+            style={[styles.listContainer,
+              isCurrentUserMessage ? styles.userMessage : styles.otherUserMessage]}>
+            <Text style={{fontSize: 14, fontWeight: "bold"}}>{item.user ? item.user.username : 'Unknown User'}:</Text>
+            <Text> {item.content}</Text>
+          </View>
+        );
+    };
+      
   
     if (loading) {
       return <Text style={{fontSize: 40}}>Loading...</Text>;
@@ -65,8 +96,8 @@ export const Messages = () => {
            keyExtractor={(item) => (item._id)}
            />
             <View style= {styles.bottomBarContainer}>
-            <TextInput placeholder={"Write something!"} style={styles.userTextInput}/>
-               <Pressable>
+            <TextInput placeholder={"Write something!"} style={styles.userTextInput}  onChangeText={(text) => (setUserMesssage(text))} />
+               <Pressable onPress={() => sendMessage(userMessage)}>
                  <Feather name="send" size={32} color="black" />
                 </Pressable> 
             </View>
@@ -83,12 +114,13 @@ const styles = StyleSheet.create({
         backgroundColor: "azure"
     },
     listContainer: {
-
-        backgroundColor: "grey",
         borderColor: "black",
         borderWidth: 1,
-        width: "50%",
-        
+        width: "45%",
+        padding: 4,
+        margin: 8,
+        borderRadius: 20,
+        borderBottomLeftRadius: 0,
     },
     userTextInput: {
         fontSize: 24,
@@ -99,5 +131,12 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         height: "6%",
         flexDirection: "row",
+    },
+    userMessage: {
+        backgroundColor: "lightgreen"
+    },
+    otherUserMessage: {
+        backgroundColor: "lightblue",
+
     }
 })
