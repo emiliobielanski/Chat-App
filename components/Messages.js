@@ -2,13 +2,13 @@ import React, { useEffect, useState, useContext} from 'react'
 import { Text, TextInput, View, StyleSheet, Button, Pressable, FlatList } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import  {AuthContext}  from './authentication/contexts/AuthContext';
-
+import { Feather } from '@expo/vector-icons';
 
 
 
 export const Messages = () => {
     const {
-        handleLogout,
+        userID,
         accessToken
     } = useContext(AuthContext);
 
@@ -28,7 +28,8 @@ export const Messages = () => {
             })
             const data = await response.json();
             if (data.status == "200") {
-                setMessagesArray(data);
+                setMessagesArray(data.data);
+                console.log("messages are fetched")
                 setLoading(false);
             }
             
@@ -43,38 +44,60 @@ export const Messages = () => {
     }, []);
 
 
-    const messageItem = ({ messagesArray }) => (
+    const messageItem = ({ item }) => (
       <View  style = {styles.listContainer}>
-        <Text> {messagesArray.data.content}</Text>
+        <Text> {item.content}</Text>
       </View>
     );
   
   
     if (loading) {
-      return <Text>Loading...</Text>;
+      return <Text style={{fontSize: 40}}>Loading...</Text>;
     }
   
 
     return (
-        <>
-            <Pressable onPress={() => handleLogout()}>
-                <Text>Logout</Text>
-            </Pressable>
-
-
+        <View style={styles.screenContainer}>
+            
            <FlatList 
            data={messagesArray}
            renderItem={messageItem}
-           keyExtractor={(item) => (item.data._id)}
+           keyExtractor={(item) => (item._id)}
            />
+            <View style= {styles.bottomBarContainer}>
+            <TextInput placeholder={"Write something!"} style={styles.userTextInput}/>
+               <Pressable>
+                 <Feather name="send" size={32} color="black" />
+                </Pressable> 
+            </View>
+          
 
-           
-        </>
+
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    listContainer: {
-        backgroundColor: "yellow"
+    screenContainer: {
+        flex: 1,
+        backgroundColor: "azure"
     },
+    listContainer: {
+
+        backgroundColor: "grey",
+        borderColor: "black",
+        borderWidth: 1,
+        width: "50%",
+        
+    },
+    userTextInput: {
+        fontSize: 24,
+        flexDirection: "row",
+        width: "80%"
+    },
+    bottomBarContainer: {
+        borderWidth: 2,
+        height: "6%",
+        flexDirection: "row",
+    }
 })

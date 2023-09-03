@@ -8,7 +8,7 @@ import { Messages } from '../../Messages';
 const AuthProvider = ({children, navigation}) => {
 
     const [accessToken, setAccessToken] = useState(null)
-    
+    const [userID, setUserID] = useState(null)
 
     const handleLogin = async (username, password) => {
        
@@ -26,11 +26,16 @@ const AuthProvider = ({children, navigation}) => {
                     },
                     body: JSON.stringify(credentials),
                 });
-        
-                const data = await response.json();
+                if (data.status == 200) {
+                    const data = await response.json();
                 await AsyncStorage.setItem('accessToken', data.data.accessToken)
                 setAccessToken(data.data.accessToken)
+                setUserID(data.data._id)
                 navigation.navigate('Messages');
+                } else if (data.status !== 200){
+                    alert(data.message)
+                }
+                
             } catch (error) {
                 console.log("Login error:", error);
             }
@@ -76,7 +81,8 @@ const AuthProvider = ({children, navigation}) => {
             accessToken,
             handleLogin,
             handleRegisterClick, 
-            handleLogout,}}>
+            handleLogout,
+            userID,}}>
             {children}
         </AuthContext.Provider>
     )

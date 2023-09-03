@@ -31,7 +31,9 @@ const Register = () => {
                 setTimeout(function(){
                    navigation.navigate("Login")
                 }, 1000);
-            }   
+            }  else if (data.status !== 200) {
+                alert(data.message)
+            }
         } catch (error) {
             console.log(error)
         }
