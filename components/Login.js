@@ -1,15 +1,13 @@
 import React, {useContext, useState} from 'react'
 import { Text, TextInput, View, StyleSheet, Button, Pressable } from 'react-native'
-import { useNavigation } from '@react-navigation/native';
-import { AuthProvider } from './authentication/contexts/AuthContext';
 import {AuthContext} from "./authentication/contexts/AuthContext"
-const Login = () => {
-    const navigation = useNavigation();
+export const Login = () => {
     
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    const {handleLogin, handleRegisterClick} = useContext(AuthContext)
-        
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const {handleLogin} = useContext(AuthContext);
+
+
 
    
 
@@ -31,14 +29,13 @@ const Login = () => {
         <Text style={{fontSize: 20, color: "white", fontWeight: "bold"}}>Login</Text>
     </Pressable>
 
-    <Pressable style={styles.registerButton} onPress={handleRegisterClick}>
+    <Pressable style={styles.registerButton} >
         <Text  style={{fontSize: 18, color: "white", fontWeight: "bold"}}>Register</Text>
     </Pressable>
  </View>
   )
 }
 
-export default Login
 
 const styles = StyleSheet.create({
     container: {

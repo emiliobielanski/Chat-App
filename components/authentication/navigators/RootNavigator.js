@@ -2,23 +2,20 @@ import React, { useContext } from 'react'
 import { View } from 'react-native';
 import AppNavigator from './AppNavigator';
 import AuthNavigator from './AuthNavigator';
-
 import {AuthContext} from "../contexts/AuthContext"
+import App from '../../../App';
 
-
-const RootNavigator = () => {
-    const {isLoggedIn} = useContext(AuthContext);
-    console.log(isLoggedIn)
+export const RootNavigator = () => {
+    const {accessToken} = useContext(AuthContext);
+    console.log(accessToken)
   return (
-    <View>
+    <>
         {
-            isLoggedIn == true
+            accessToken == null
         ? <AppNavigator />
         : <AuthNavigator />  
          }
-    </View>
+    </>
     
   )
 }
-
-export default RootNavigator

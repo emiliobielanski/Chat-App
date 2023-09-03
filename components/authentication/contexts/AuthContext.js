@@ -1,12 +1,16 @@
-import React, { createContext, useContext, useState} from 'react'
+import React, { createContext, useContext, useEffect, useState} from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const AuthContext = createContext()
 
-export const AuthProvider = ({children}) => {
+
+ const AuthContext = createContext();
+
+ const AuthProvider = ({children, navigation}) => {
 
     const [accessToken, setAccessToken] = useState(null)
-    const [isLoggedin, setIsLoggedIn] = useState(false)
-    const handleLogin = async () => {
+    const [messagesArray, setMessagesArray] = useState([])
+
+    const handleLogin = async (username, password) => {
        
             try {
                 // Fetch access token from the API
@@ -24,23 +28,68 @@ export const AuthProvider = ({children}) => {
                 });
         
                 const data = await response.json();
-                setAccessToken(data.data.accessToken);
-                setIsLoggedIn(true)
-                // Navigate to Messages screen and pass access token as a parameter
-                navigation.navigate('Messages', { token: accessToken });
+                console.log(data)
+                await AsyncStorage.setItem('accessToken', data.data.accessToken)
+                setAccessToken(data.data.accessToken)
+                console.log(accessToken)
+                navigation.navigate('Messages');
             } catch (error) {
                 console.log("Login error:", error);
             }
         
     }
-    const handleRegisterClick = () => {
-        navigation.navigate("Register");
-       }
 
     
+
+    const fetchMessages = async () => {
+        try {
+            const response = await fetch("https://chat-api-with-auth.up.railway.app/messages",{
+                method: "GET",
+                headers: {
+                   'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${accessToken}`
+               }
+    
+            })
+            const data = await response.json();
+            if (data.status == "200") {
+                setMessagesArray(data);
+            }
+            
+            
+        } catch (error) {
+           console.log(error)
+        }
+       }
+       useEffect(() => {
+        fetchMessages();
+    }, []);
+
+    const handleRegisterClick = () => {
+        navigation.navigate("Register");
+    }
+
+    const handleLogout = async () => {
+        console.log('handleLogout')
+    
+        try {
+          await AsyncStorage.removeItem('accessToken')
+          setAccessToken(null)
+        } catch(error) {
+          console.log(error)
+        }
+      }
+    
     return (
-        <AuthContext.Provider value={[accessToken, handleLogin, handleRegisterClick, isLoggedin]}>
+        <AuthContext.Provider value={[
+            accessToken,
+            handleLogin,
+            handleRegisterClick, 
+            fetchMessages,
+            messagesArray,
+            handleLogout,]}>
             {children}
         </AuthContext.Provider>
     )
 }
+export { AuthContext, AuthProvider };
