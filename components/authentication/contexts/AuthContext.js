@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useEffect, useState} from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { Messages } from '../../Messages';
 
 
  const AuthContext = createContext();
 
- const AuthProvider = ({children, navigation}) => {
+const AuthProvider = ({children, navigation}) => {
 
     const [accessToken, setAccessToken] = useState(null)
-    const [messagesArray, setMessagesArray] = useState([])
+    
 
     const handleLogin = async (username, password) => {
        
@@ -28,10 +28,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
                 });
         
                 const data = await response.json();
-                console.log(data)
                 await AsyncStorage.setItem('accessToken', data.data.accessToken)
                 setAccessToken(data.data.accessToken)
-                console.log(accessToken)
                 navigation.navigate('Messages');
             } catch (error) {
                 console.log("Login error:", error);
@@ -41,29 +39,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
     
 
-    const fetchMessages = async () => {
-        try {
-            const response = await fetch("https://chat-api-with-auth.up.railway.app/messages",{
-                method: "GET",
-                headers: {
-                   'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${accessToken}`
-               }
     
-            })
-            const data = await response.json();
-            if (data.status == "200") {
-                setMessagesArray(data);
-            }
-            
-            
-        } catch (error) {
-           console.log(error)
-        }
-       }
-       useEffect(() => {
-        fetchMessages();
-    }, []);
 
     const handleRegisterClick = () => {
         navigation.navigate("Register");
@@ -78,16 +54,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         } catch(error) {
           console.log(error)
         }
-      }
+    }
     
+    const isLoggedIn = async () => {
+
+        try {
+          const token = await AsyncStorage.getItem('accessToken')
+          setAccessToken(token)
+        } catch(error) {
+          console.log(error)
+        }
+    }
+    
+    useEffect(() => {
+        isLoggedIn();
+    }, [])
+
+
     return (
-        <AuthContext.Provider value={[
+        <AuthContext.Provider value={{
             accessToken,
             handleLogin,
             handleRegisterClick, 
-            fetchMessages,
-            messagesArray,
-            handleLogout,]}>
+            handleLogout,}}>
             {children}
         </AuthContext.Provider>
     )
