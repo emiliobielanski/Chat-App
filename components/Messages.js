@@ -5,7 +5,8 @@ import { Feather } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BottomTabView, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Profile } from './Profile';
-
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 export const Messages = () => {
     const Tab = createBottomTabNavigator();
 
@@ -110,23 +111,30 @@ export const Messages = () => {
 
     return (
         <Tab.Navigator>
-
-        <View style={styles.screenContainer}>
+            <Tab.Screen name="Messages" options={{ tabBarLabel: 'Messages', tabBarIcon: () => <MaterialCommunityIcons name="message" size={30} color="black" />, tabBarLabelStyle: {fontSize: 14,}}}>
+            {() => (
+             <View style={styles.screenContainer} >
             
-           <FlatList 
-           ref={flatListRef}
-           data={messagesArray}
-           renderItem={messageItem}
-           keyExtractor={(item) => (item._id)}
-           />
-            <View style= {styles.bottomBarContainer}>
-            <TextInput placeholder={"Write something!"} style={styles.userTextInput}  onChangeText={(text) => (setUserMesssage(text))} />
-               <Pressable onPress={() => sendMessage(userMessage)}>
+                <FlatList 
+                ref={flatListRef}
+                data={messagesArray}
+                renderItem={messageItem}
+                keyExtractor={(item) => (item._id)}
+                />
+                 <View style= {styles.bottomBarContainer}>
+                 <TextInput placeholder={"Write something!"} style={styles.userTextInput}  onChangeText={(text) => (setUserMesssage(text))} />
+                 <Pressable onPress={() => sendMessage(userMessage)}>
                  <Feather name="send" size={32} color="black" />
-                </Pressable> 
-            </View>
-        </View>
-        <Tab.Screen name="Profile" component={Profile} />
+                 </Pressable> 
+              </View>
+              </View>
+               )}
+            </Tab.Screen >
+        <Tab.Screen name="Profile" component={Profile}
+           options={{
+            tabBarIcon: () => <FontAwesome name="user-circle" size={30} color="black" /> ,
+            tabBarLabelStyle: {fontSize: 14,}
+          }} />
         </Tab.Navigator>
     );
 }

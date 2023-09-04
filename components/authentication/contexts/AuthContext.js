@@ -10,7 +10,7 @@ const AuthProvider = ({children, navigation}) => {
 
     const [accessToken, setAccessToken] = useState(null)
     const [userID, setUserID] = useState("")
-
+    const [username, setUsername] = useState("")
     const handleLogin = async (username, password) => {
        
             try {
@@ -35,7 +35,9 @@ const AuthProvider = ({children, navigation}) => {
                 setAccessToken(data.data.accessToken)
                 await AsyncStorage.setItem('userID', data.data._id)
                 setUserID(data.data._id)
-
+                await AsyncStorage.setItem("username", data.data.username)
+                setUsername(data.data.username)
+                console.log(username)
                 navigation.navigate('Messages');
 
                 } else if (data.status !== 200){
@@ -60,6 +62,10 @@ const AuthProvider = ({children, navigation}) => {
         try {
           await AsyncStorage.removeItem('accessToken')
           setAccessToken(null)
+          await AsyncStorage.removeItem('userID')
+          setUserID(null)
+          await AsyncStorage.removeItem('username')
+          setUsername(null)
         } catch(error) {
           console.log(error)
         }
@@ -87,7 +93,9 @@ const AuthProvider = ({children, navigation}) => {
             accessToken,
             handleLogin, 
             handleLogout,
-            userID}}>
+            userID,
+            username,
+            setUsername}}>
             {children}
         </AuthContext.Provider>
     )
