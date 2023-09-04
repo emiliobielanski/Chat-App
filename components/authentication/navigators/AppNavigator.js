@@ -1,16 +1,15 @@
 import React from 'react'
-import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import {Messages} from '../../Messages';
-import {Settings} from '../../Settings';
+import {Profile} from '../../Profile';
 
 const AppNavigator = () => {
-  const Stack = createStackNavigator();
+  const Drawer = createDrawerNavigator();
   return (
 
-    <Stack.Navigator>
-     <Stack.Screen  name="Messages" component={Messages} />
-      <Stack.Screen name="Settings" component={Settings} />
-    </Stack.Navigator>
+    <Drawer.Navigator>
+     <Drawer.Screen  name="Messages" component={Messages} />
+    </Drawer.Navigator>
 
   )
 }
