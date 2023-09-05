@@ -4,8 +4,12 @@ import { AuthContext } from './authentication/contexts/AuthContext'
 import { FontAwesome } from '@expo/vector-icons';
 import { TextInput } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
+import { Foundation } from '@expo/vector-icons';
+import CameraView from './camera/CameraView';
+import { createStackNavigator } from '@react-navigation/stack';
 
 export const Profile = () => {
+  const Stack = createStackNavigator();
   const {handleLogout, username,
     accessToken} = useContext(AuthContext);
   const [firstname, setFirstname] = useState("")
@@ -58,12 +62,24 @@ const deleteUser = async () => {
   }
 }
 
+const navToCamera= () => {
+  navigation.navigate("CameraView")
+}
   
 
 
   return (
     <View style={styles.profileContainer}>
+
+        <View style={{flex: 1, flexDirection: "row", justifyContent: "center"}}>
        <FontAwesome name="user" size={180} color="black" style={styles.profileIcon}/>
+       
+       <Pressable onPress={() => navToCamera()}>
+       <Foundation name="camera" size={36} color="black" style={{ marginTop:30}} />
+      
+       </Pressable>
+        </View>
+
       <TextInput  style={styles.firstName} placeholder='First Name' value={firstname} onChangeText={setFirstname}/>
       <TextInput style={styles.lastName} placeholder="Last Name" value={lastname} onChangeText={setLastname} />
 
@@ -84,6 +100,7 @@ const deleteUser = async () => {
     <Pressable style={styles.logoutBtn} onPress={() => handleLogout()}>
     <Text style={{fontSize: 24, fontWeight: "bold"}}>Logout</Text>
     </Pressable>
+
     </View>
   )
 }
@@ -107,7 +124,8 @@ const styles = StyleSheet.create({
   profileIcon: {
     justifyContent: "center",
     alignSelf: "center",
-    marginBottom: 20
+    marginBottom: 20,
+    marginHorizontal: "auto"
   },
   firstName: {
     borderColor: "black",
