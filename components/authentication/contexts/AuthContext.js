@@ -3,13 +3,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Messages } from '../../Messages';
 
 
+
  const AuthContext = createContext();
 
 const AuthProvider = ({children, navigation}) => {
 
     const [accessToken, setAccessToken] = useState(null)
-    const [userID, setUserID] = useState(null)
-
+    const [userID, setUserID] = useState("")
+    const [username, setUsername] = useState("")
     const handleLogin = async (username, password) => {
        
             try {
@@ -26,12 +27,19 @@ const AuthProvider = ({children, navigation}) => {
                     },
                     body: JSON.stringify(credentials),
                 });
+                const data = await response.json();
+                
+                
                 if (data.status == 200) {
-                    const data = await response.json();
                 await AsyncStorage.setItem('accessToken', data.data.accessToken)
                 setAccessToken(data.data.accessToken)
-                setUserID(data.data.user._id)
+                await AsyncStorage.setItem('userID', data.data._id)
+                setUserID(data.data._id)
+                await AsyncStorage.setItem("username", data.data.username)
+                setUsername(data.data.username)
+                console.log(username)
                 navigation.navigate('Messages');
+
                 } else if (data.status !== 200){
                     alert(data.message)
                 }
@@ -46,9 +54,7 @@ const AuthProvider = ({children, navigation}) => {
 
     
 
-    const handleRegisterClick = () => {
-        navigation.navigate("Register");
-    }
+   
 
     const handleLogout = async () => {
         console.log('handleLogout')
@@ -56,6 +62,10 @@ const AuthProvider = ({children, navigation}) => {
         try {
           await AsyncStorage.removeItem('accessToken')
           setAccessToken(null)
+          await AsyncStorage.removeItem('userID')
+          setUserID(null)
+          await AsyncStorage.removeItem('username')
+          setUsername(null)
         } catch(error) {
           console.log(error)
         }
@@ -66,6 +76,8 @@ const AuthProvider = ({children, navigation}) => {
         try {
           const token = await AsyncStorage.getItem('accessToken')
           setAccessToken(token)
+          const loggedinID = await AsyncStorage.getItem('userID')
+          setUserID(loggedinID)
         } catch(error) {
           console.log(error)
         }
@@ -79,10 +91,11 @@ const AuthProvider = ({children, navigation}) => {
     return (
         <AuthContext.Provider value={{
             accessToken,
-            handleLogin,
-            handleRegisterClick, 
+            handleLogin, 
             handleLogout,
-            userID}}>
+            userID,
+            username,
+            setUsername}}>
             {children}
         </AuthContext.Provider>
     )

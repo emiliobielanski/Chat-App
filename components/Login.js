@@ -1,14 +1,18 @@
 import React, {useContext, useState} from 'react'
 import { Text, TextInput, View, StyleSheet, Button, Pressable } from 'react-native'
 import {AuthContext} from "./authentication/contexts/AuthContext"
+import { useNavigation } from '@react-navigation/native';
+
 export const Login = () => {
     
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const {handleLogin} = useContext(AuthContext);
+    const navigation = useNavigation();
 
-
-
+    const handleRegisterClick = () => {
+        navigation.navigate("Register");
+    }
    
 
   return (
@@ -29,7 +33,7 @@ export const Login = () => {
         <Text style={{fontSize: 20, color: "white", fontWeight: "bold"}}>Login</Text>
     </Pressable>
 
-    <Pressable style={styles.registerButton} >
+    <Pressable style={styles.registerButton} onPress={() => handleRegisterClick()} >
         <Text  style={{fontSize: 18, color: "white", fontWeight: "bold"}}>Register</Text>
     </Pressable>
  </View>

@@ -1,12 +1,15 @@
-import React, { useEffect, useState, useContext} from 'react'
-import { Text, TextInput, View, StyleSheet, Button, Pressable, FlatList } from 'react-native'
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState, useContext, useRef} from 'react'
+import { Text, TextInput, View, StyleSheet, Button, Pressable, FlatList, Keyboard } from 'react-native'
 import  {AuthContext}  from './authentication/contexts/AuthContext';
 import { Feather } from '@expo/vector-icons';
-
-
-
+import { MaterialIcons } from '@expo/vector-icons';
+import { BottomTabView, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Profile } from './Profile';
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 export const Messages = () => {
+    const Tab = createBottomTabNavigator();
+
     const {
         userID,
         accessToken
@@ -15,10 +18,11 @@ export const Messages = () => {
     const [loading, setLoading] = useState(true);
     const [userMessage, setUserMesssage] = useState("")
     const [messagesArray, setMessagesArray] = useState([])
+    const flatListRef = useRef(null);
 
     const fetchMessages = async () => {
         try {
-            const response = await fetch("https://chat-api-with-auth.up.railway.app/messages",{
+            const response = await fetch(`https://chat-api-with-auth.up.railway.app/messages`,{
                 method: "GET",
                 headers: {
                    'Content-Type': 'application/json',
@@ -31,6 +35,7 @@ export const Messages = () => {
                 setMessagesArray(data.data);
                 console.log("messages are fetched")
                 setLoading(false);
+                flatListRef.current.scrollToOffset({ offset: 0, animated: true });
             }
             
             
@@ -58,25 +63,42 @@ export const Messages = () => {
                body: JSON.stringify(messageContent)
     
             })
+            Keyboard.dismiss()
+            setUserMesssage("");
             fetchMessages();
         } catch (error) {
             console.log(error)
         }
     }
 
+    const deleteMessage = async (itemID) => {
+        try {
+            const response = await fetch(`https://chat-api-with-auth.up.railway.app/messages/${itemID}`,{
+                method: "DELETE",
+                headers: {
+                   'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${accessToken}`
+               }
+            
+            })
+            const deleteData = response.json();
+            console.log(deleteData)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
 
     const messageItem = ({ item }) => {
-        let isCurrentUserMessage = false;
 
-        if (item.user && item.user._id === userID) {
-            isCurrentUserMessage = true;
-        }
         return (
-          <View
-            style={[styles.listContainer,
-              isCurrentUserMessage ? styles.userMessage : styles.otherUserMessage]}>
-            <Text style={{fontSize: 14, fontWeight: "bold"}}>{item.user ? item.user.username : 'Unknown User'}:</Text>
-            <Text> {item.content}</Text>
+          <View style={[styles.listContainer,
+                item.user && item.user._id === userID ? styles.userMessage : styles.otherUserMessage]}>
+         <Text style={{fontSize: 14, fontWeight: "bold"}}>{item.user ? item.user.username : 'Unknown User'}:</Text>
+           { item.user && item.user._id === userID
+        ?  <Text> {item.content} <MaterialIcons name="delete-forever" size={30} color="black" onPress={() => deleteMessage(item._id)} /> </Text> 
+        :  <Text> {item.content} </Text> }
           </View>
         );
     };
@@ -88,23 +110,32 @@ export const Messages = () => {
   
 
     return (
-        <View style={styles.screenContainer}>
+        <Tab.Navigator>
+            <Tab.Screen name="Messages" options={{ tabBarLabel: 'Messages', tabBarIcon: () => <MaterialCommunityIcons name="message" size={30} color="black" />, tabBarLabelStyle: {fontSize: 14,}}}>
+            {() => (
+             <View style={styles.screenContainer} >
             
-           <FlatList 
-           data={messagesArray}
-           renderItem={messageItem}
-           keyExtractor={(item) => (item._id)}
-           />
-            <View style= {styles.bottomBarContainer}>
-            <TextInput placeholder={"Write something!"} style={styles.userTextInput}  onChangeText={(text) => (setUserMesssage(text))} />
-               <Pressable onPress={() => sendMessage(userMessage)}>
+                <FlatList 
+                ref={flatListRef}
+                data={messagesArray}
+                renderItem={messageItem}
+                keyExtractor={(item) => (item._id)}
+                />
+                 <View style= {styles.bottomBarContainer}>
+                 <TextInput placeholder={"Write something!"} style={styles.userTextInput}  onChangeText={(text) => (setUserMesssage(text))} />
+                 <Pressable onPress={() => sendMessage(userMessage)}>
                  <Feather name="send" size={32} color="black" />
-                </Pressable> 
-            </View>
-          
-
-
-        </View>
+                 </Pressable> 
+              </View>
+              </View>
+               )}
+            </Tab.Screen >
+        <Tab.Screen name="Profile" component={Profile}
+           options={{
+            tabBarIcon: () => <FontAwesome name="user-circle" size={30} color="black" /> ,
+            tabBarLabelStyle: {fontSize: 14,}
+          }} />
+        </Tab.Navigator>
     );
 }
 
@@ -120,7 +151,7 @@ const styles = StyleSheet.create({
         padding: 4,
         margin: 8,
         borderRadius: 20,
-        borderBottomLeftRadius: 0,
+       
     },
     userTextInput: {
         fontSize: 24,
@@ -133,10 +164,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     userMessage: {
-        backgroundColor: "lightgreen"
+        backgroundColor: "lightgreen",
+        justifyContent: "flex-end",
+        borderBottomRightRadius: 0,
+        marginLeft: "auto"
     },
     otherUserMessage: {
         backgroundColor: "lightblue",
-
+        borderBottomLeftRadius: 0,
     }
 })
